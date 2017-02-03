@@ -99,13 +99,9 @@ export function postsByCategory(state = Map({
         case INVALIDATE_CATEGORY:
         case RECEIVE_POSTS:
         case REQUEST_POSTS:
-            console.log(JSON.stringify(state));
             var postByCategory = state.get('postsByCategory');
             var newPostByCategory = Object.assign({}, postByCategory, {[action.category]: posts(state[action.category], action)});
             return state.set('postsByCategory', newPostByCategory);
-            // return Object.assign({}, state, {
-            //     [action.category]: posts(state[action.category], action)
-            // });
         default:
             return state;
     }
