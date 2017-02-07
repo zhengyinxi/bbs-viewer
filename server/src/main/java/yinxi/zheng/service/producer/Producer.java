@@ -1,5 +1,6 @@
 package yinxi.zheng.service.producer;
 
+import java.rmi.ServerException;
 import java.util.List;
 
 /**
@@ -7,6 +8,6 @@ import java.util.List;
  */
 public interface Producer {
     List getCategories();
-    List getPostsList(String category, Integer pageIndex);
-    List getPostContent(String id, String category);
+    List getPostsList(String categoryId, Integer pageIndex) throws ServerException;
+    List getPostContent(String postId, String categoryId);
 }
