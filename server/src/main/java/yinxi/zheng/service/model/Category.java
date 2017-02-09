@@ -1,5 +1,6 @@
 package yinxi.zheng.service.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import yinxi.zheng.service.producer.Producer;
 
 /**
@@ -8,6 +9,7 @@ import yinxi.zheng.service.producer.Producer;
 public class Category {
     private String id;
     private String name;
+    @JsonIgnore
     private Producer producer;
 
     public String getId() {

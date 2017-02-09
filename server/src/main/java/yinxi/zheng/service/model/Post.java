@@ -6,12 +6,30 @@ import java.util.Date;
  * Created by zhengyinxi on 2017/2/7.
  */
 public class Post {
+    private String subCategory;
     private String title;
     private String id;
     private String author;
     private Date publishTime;
     private Date lastUpdateTime;
     private Integer replyNumber;
+    private String content;
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(String subCategory) {
+        this.subCategory = subCategory;
+    }
 
     public String getTitle() {
         return title;
