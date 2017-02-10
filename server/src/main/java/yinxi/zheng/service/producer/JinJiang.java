@@ -92,6 +92,23 @@ public class JinJiang implements Producer {
         return result;
     }
 
+    @Override
+    public PostDetails getPostContent(String postId, String category) throws IOException {
+        Document document = null;
+        try {
+            document = Jsoup.connect(this.postDetailUrl)
+                    .data("board",category)
+                    .data("id", postId)
+                    .get();
+        } catch (IOException e) {
+            throw new IOException("cannot connect JinJiang url", e);
+        }
+        PostDetails postDetails = new PostDetails();
+        postDetails.setPost(this.parsePost(postId, document));
+        postDetails.setReplyList(this.parseReply(document,category,postId));
+        return postDetails;
+    }
+
     private Post constructFromTr(Element tr){
         Post post = new Post();
         post.setSubCategory(tr.child(0).text());
@@ -123,23 +140,6 @@ public class JinJiang implements Producer {
             throw new IllegalArgumentException("input " + input + " not match pattern (最后更新：yy-MM-dd HH:mm)");
         }
 
-    }
-
-    @Override
-    public PostDetails getPostContent(String postId, String category) throws IOException {
-        Document document = null;
-        try {
-            document = Jsoup.connect(this.postDetailUrl)
-                    .data("board",category)
-                    .data("id", postId)
-                    .get();
-        } catch (IOException e) {
-            throw new IOException("cannot connect JinJiang url", e);
-        }
-        PostDetails postDetails = new PostDetails();
-        postDetails.setPost(this.parsePost(postId, document));
-        postDetails.setReplyList(this.parseReply(document,category,postId));
-        return postDetails;
     }
 
     private Post parsePost(String id, Document document){
