@@ -21,10 +21,7 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -180,21 +177,43 @@ public class JinJiang implements Producer {
                     ).orElse("1"));
         }
         List<Document> documents = new ArrayList<Document>(){{add(firstPage);}};
-        for(int i = 1; i< totalPageNumber; ++i){
+        for(int i = 1; i < totalPageNumber; ++i){
             documents.add(Jsoup.connect(this.postDetailUrl)
                     .data("board",category)
                     .data("id", postId)
                     .get());
         }
-        documents.stream().map(document -> {
-            List<Reply> replies = new ArrayList<>();
-            Element table = document.getElementsByTag("table").get(2);
-            //todo 
+        List<Reply>  result= documents.stream().map(document -> {
+            Elements trs = document.getElementsByAttributeValue("width", "760").select("table").get(4).getElementsByTag("tr");
+            List<Reply> replies = trs.stream()
+                    .filter(tr->!"".equals(tr.attr("class")))
+                    .collect(Collectors.groupingBy(tr -> tr.attr("class")))
+                    .entrySet().stream()
+                    .map(entry -> {
+                        Reply reply = new Reply();
+                        reply.setId(entry.getKey().replaceAll("[\\D]",""));
+                        if("reply_7485498".equals(entry.getKey())){
+                            int a= 0;
+                        }
+                        List<Element> trWithSameClass = entry.getValue();
+                        reply.setContent(trWithSameClass.get(1).text());
+                        Elements authorname = trWithSameClass.get(2).getElementsByClass("authorname");
+                        Element authornameLine = authorname.get(0);
+                        if(authornameLine.childNodes().size() < 6){
+                            return reply;
+                        }
+                        reply.setAuthor(authornameLine.childNode(3).outerHtml());
+                        try {
+                            reply.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss留言").parse(authornameLine.childNode(5).outerHtml()));
+                        } catch (ParseException e) {
+                        }
+                        return reply;
+                    })
+                    .collect(Collectors.toList());
             return replies;
-        });
-
-        List<Reply> replies = new ArrayList<>();
-
-        return replies;
+        }).collect(ArrayList<Reply>::new, List::addAll, List::addAll)
+                .stream()
+                .sorted(Comparator.comparingInt(a -> Integer.parseInt(a.getId()))).collect(Collectors.toList());
+        return result;
     }
 }
